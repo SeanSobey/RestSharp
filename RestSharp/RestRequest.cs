@@ -74,6 +74,7 @@ namespace RestSharp
         /// </summary>
         public RestRequest()
         {
+            this.Encode = true;
             this.RequestFormat = DataFormat.Xml;
             this.Method = Method.GET;
             this.Parameters = new List<Parameter>();
