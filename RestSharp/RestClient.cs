@@ -328,10 +328,10 @@ namespace RestSharp
 
                 if (!string.IsNullOrEmpty(assembled))
                 {
-                    assembled = assembled.Replace("{" + p.Name + "}", p.Value.ToString().UrlEncode());
+                    assembled = assembled.Replace("{" + p.Name + "}", request.Encode ? p.Value.ToString().UrlEncode() : p.Value.ToString());
                 }
 
-                builder.Path = builder.Path.UrlDecode().Replace("{" + p.Name + "}", p.Value.ToString().UrlEncode());
+                builder.Path = builder.Path.UrlDecode().Replace("{" + p.Name + "}", request.Encode ? p.Value.ToString().UrlEncode() : p.Value.ToString());
             }
 
             this.BaseUrl = new Uri(builder.ToString());
@@ -375,7 +375,7 @@ namespace RestSharp
             }
 
             // build and attach querystring
-            string data = EncodeParameters(parameters);
+            string data = JoinParameters(parameters, request.Encode);
             string separator = assembled != null && assembled.Contains("?")
                 ? "&"
                 : "?";
@@ -385,17 +385,17 @@ namespace RestSharp
             return new Uri(assembled);
         }
 
-        private static string EncodeParameters(IEnumerable<Parameter> parameters)
+        private static string JoinParameters(IEnumerable<Parameter> parameters, bool encode)
         {
-            return string.Join("&", parameters.Select(EncodeParameter)
+            return string.Join("&", parameters.Select(parameter => JoinParameterParameter(parameter, encode))
                                               .ToArray());
         }
 
-        private static string EncodeParameter(Parameter parameter)
+        private static string JoinParameterParameter(Parameter parameter, bool encode)
         {
             return parameter.Value == null
-                ? string.Concat(parameter.Name.UrlEncode(), "=")
-                : string.Concat(parameter.Name.UrlEncode(), "=", parameter.Value.ToString().UrlEncode());
+                ? string.Concat(encode ? parameter.Name.UrlEncode() : parameter.Name, "=")
+                : string.Concat(encode ? parameter.Name.UrlEncode() : parameter.Name, "=", encode ? parameter.Value.ToString().UrlEncode() : parameter.Value.ToString());
         }
 
         private void ConfigureHttp(IRestRequest request, IHttp http)

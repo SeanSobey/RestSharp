@@ -27,6 +27,11 @@ namespace RestSharp
     public interface IRestRequest
     {
         /// <summary>
+        /// Perform URL encoding on the request.
+        /// </summary>
+        bool Encode { get; set; }
+
+        /// <summary>
         /// Always send a multipart/form-data request - even when no Files are present.
         /// </summary>
         bool AlwaysMultipartFormData { get; set; }
